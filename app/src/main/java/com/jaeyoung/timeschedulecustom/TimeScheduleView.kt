@@ -142,11 +142,30 @@ class TimeScheduleView : ViewGroup {
             if (startAngle > endAngle) 360 - startAngle + endAngle else endAngle - startAngle
         var checkFlag = true
         data.forEach {
-               if ((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle)) {
-                   checkFlag = false
-               }
+            /*if (((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle))||startAngle==it.startAngle) {
+                checkFlag = false
+            }*/
+            if (it.startAngle == startAngle && endAngle == it.endAngle) checkFlag = false
+
+                if (it.startAngle < it.endAngle) {
+                    if (((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle))) {
+                        checkFlag = false
+                    }
+                } else {
+                    if ((((startAngle > it.startAngle && startAngle < 360)&&(startAngle>0 && startAngle < it.endAngle)) || ((endAngle > 0 && endAngle < it.endAngle)&&(endAngle > it.startAngle && endAngle < 360)))) {
+                        checkFlag = false
+                    }
+                }
+
         }
-        if (checkFlag) data.add(Schedule(startAngle, endAngle, wholeAngle, title))
+        if (checkFlag && startAngle != endAngle) data.add(
+            Schedule(
+                startAngle,
+                endAngle,
+                wholeAngle,
+                title
+            )
+        )
         else Toast.makeText(context, "안됨", Toast.LENGTH_SHORT).show()
         invalidate()
     }
