@@ -8,7 +8,6 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import kotlin.math.*
@@ -33,7 +32,7 @@ class TimeScheduleView : ViewGroup {
         context,
         attrs,
         defStyleAttr
-    ){
+    ) {
         setWillNotDraw(false)
     }
 
@@ -45,14 +44,13 @@ class TimeScheduleView : ViewGroup {
                     if (backgroundClickable(motionEvent.x, motionEvent.y)) {
                         val pX = getPositionX(motionEvent.x)
                         val pY = getPositionY(motionEvent.y)
-                        val quad = quadrant(pX, pY)
+                        val quad = getQuadrant(pX, pY)
                         val angle = getAngle(quad, abs(pX), abs(pY))
                         data.forEachIndexed { index, schedule ->
                             if (itemTouchCondition(
                                     angle,
                                     schedule.startAngle,
-                                    schedule.endAngle,
-                                    schedule.wholeAngle
+                                    schedule.endAngle
                                 )
                             ) {
                                 Toast.makeText(context, schedule.title, Toast.LENGTH_SHORT).show()
@@ -78,11 +76,19 @@ class TimeScheduleView : ViewGroup {
     fun itemTouchCondition(
         angle: Float,
         startAngle: Float,
-        endAngle: Float,
-        wholeAngle: Float
+        endAngle: Float
     ): Boolean {
-        return (angle > startAngle && angle < endAngle) || (startAngle > endAngle && angle > startAngle || (angle >= 0 && angle < endAngle))
+        return (angle > startAngle && angle < endAngle) || (startAngle > endAngle && (angle > startAngle || (angle >= 0 && angle < endAngle)))
     }
+
+    fun itemAddCondition(
+        angle: Float,
+        startAngle: Float,
+        endAngle: Float
+    ): Boolean {
+        return (angle in startAngle..endAngle) || (startAngle >= endAngle && (angle >= startAngle || (angle >= 0 && angle <= endAngle)))
+    }
+
 
     fun getAngle(quad: Int, width: Float, height: Float): Float {
         val angle = atan2(width.toDouble(), height.toDouble()) * 180 / PI
@@ -104,7 +110,7 @@ class TimeScheduleView : ViewGroup {
         }
     }
 
-    fun quadrant(x: Float, y: Float): Int {
+    fun getQuadrant(x: Float, y: Float): Int {
         return if (x > 0 && y > 0) 1
         else if (x < 0 && y > 0) 2
         else if (x < 0 && y < 0) 3
@@ -136,10 +142,9 @@ class TimeScheduleView : ViewGroup {
             if (startAngle > endAngle) 360 - startAngle + endAngle else endAngle - startAngle
         var checkFlag = true
         data.forEach {
-            checkFlag = !(addOverlapCheck(it.startAngle,it.endAngle,startAngle,endAngle))
-         /*   if ((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle)) {
-                checkFlag = false
-            }*/
+               if ((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle)) {
+                   checkFlag = false
+               }
         }
         if (checkFlag) data.add(Schedule(startAngle, endAngle, wholeAngle, title))
         else Toast.makeText(context, "안됨", Toast.LENGTH_SHORT).show()
@@ -147,7 +152,7 @@ class TimeScheduleView : ViewGroup {
     }
 
     fun addOverlapCheck(preStart: Float, preEnd: Float, start: Float, end: Float): Boolean {
-        return (start>preStart && start < preEnd) || (end > preStart && end < preEnd)
+        return (start > preStart && start < preEnd) || (end > preStart && end < preEnd)
     }
 
     override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
@@ -164,14 +169,8 @@ class TimeScheduleView : ViewGroup {
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        println("Invalidate")
+
         val pnt = Paint();
-        val pntBack = Paint();
-        pntBack.apply {
-            strokeWidth = 6f
-            color = Color.parseColor("#000000")
-            style = Paint.Style.FILL_AND_STROKE
-        }
 
         pnt.apply {
             strokeWidth = 6f
@@ -181,7 +180,6 @@ class TimeScheduleView : ViewGroup {
 
         val rect = RectF()
         rect.set(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat())
-        canvas?.drawArc(rect, CENTER_ANGLE , 360f, true, pntBack)
         data.forEach {
             canvas?.drawArc(rect, CENTER_ANGLE + it.startAngle, it.wholeAngle, true, pnt)
         }
