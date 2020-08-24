@@ -33,7 +33,7 @@ class TimeBackMainView : LinearLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         screenWidth = MeasureSpec.getSize(widthMeasureSpec)
         screenHeight = screenWidth
-        val padding = 20.dp
+        val padding = 40.dp
         setPadding(padding,padding,padding,padding)
         setMeasuredDimension(screenWidth,screenHeight)
 
