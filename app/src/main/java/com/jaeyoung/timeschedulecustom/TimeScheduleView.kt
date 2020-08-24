@@ -38,6 +38,7 @@ class TimeScheduleView : ViewGroup {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun init() {
+
         setOnTouchListener { _, motionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_UP -> {
@@ -135,7 +136,7 @@ class TimeScheduleView : ViewGroup {
         return (time) / 1440f * 360f
     }
 
-    fun addItem(startTime: Int, endTime: Int, title: String) {
+    fun addItem(startTime: Int, endTime: Int, title: String , color:String) {
         val startAngle = getTimeAngle(startTime)
         val endAngle = getTimeAngle(endTime)
         val wholeAngle =
@@ -148,11 +149,11 @@ class TimeScheduleView : ViewGroup {
             if (it.startAngle == startAngle && endAngle == it.endAngle) checkFlag = false
 
                 if (it.startAngle < it.endAngle) {
-                    if (((startAngle > it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle < it.endAngle))) {
+                    if (((startAngle >= it.startAngle && startAngle < it.endAngle) || (endAngle > it.startAngle && endAngle <= it.endAngle))) {
                         checkFlag = false
                     }
                 } else {
-                    if ((((startAngle > it.startAngle && startAngle < 360)&&(startAngle>0 && startAngle < it.endAngle)) || ((endAngle > 0 && endAngle < it.endAngle)&&(endAngle > it.startAngle && endAngle < 360)))) {
+                    if ((((startAngle >= it.startAngle && startAngle <= 360)||(startAngle>0 && startAngle < it.endAngle)) || ((endAngle >= 0 && endAngle <= it.endAngle)||(endAngle > it.startAngle && endAngle < 360)))) {
                         checkFlag = false
                     }
                 }
@@ -163,7 +164,8 @@ class TimeScheduleView : ViewGroup {
                 startAngle,
                 endAngle,
                 wholeAngle,
-                title
+                title,
+                color
             )
         )
         else Toast.makeText(context, "안됨", Toast.LENGTH_SHORT).show()
@@ -194,12 +196,12 @@ class TimeScheduleView : ViewGroup {
         pnt.apply {
             strokeWidth = 6f
             color = Color.parseColor("#FF0000")
-            style = Paint.Style.FILL
         }
 
         val rect = RectF()
         rect.set(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat())
         data.forEach {
+            pnt.color = Color.parseColor(it.color)
             canvas?.drawArc(rect, CENTER_ANGLE + it.startAngle, it.wholeAngle, true, pnt)
         }
 
@@ -211,6 +213,7 @@ class TimeScheduleView : ViewGroup {
         val startAngle: Float,
         val endAngle: Float,
         val wholeAngle: Float,
-        val title: String
+        val title: String,
+        val color : String
     )
 }

@@ -7,17 +7,24 @@
     android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:background="@drawable/back"
-        android:padding="36dp">
-        <com.jaeyoung.timeschedulecustom.TimeScheduleView
-            android:id="@+id/timeSchedule"
+    <com.jaeyoung.timeschedulecustom.TimeBackMainView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <com.jaeyoung.timeschedulecustom.TimeBackView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <com.jaeyoung.timeschedulecustom.TimeScheduleView
+                android:id="@+id/timeSchedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.jaeyoung.timeschedulecustom.TimeBackView>
+    </com.jaeyoung.timeschedulecustom.TimeBackMainView>
+
 
 
     <LinearLayout
